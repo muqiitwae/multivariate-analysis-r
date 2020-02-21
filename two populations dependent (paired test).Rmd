@@ -1,0 +1,54 @@
+---
+title: "two populations dependent"
+author: "muqiitsaputra"
+date: "2/21/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+######## Richard Johnson Ed. 5 p. 275 ########
+x1j1 <- c(6,6,18,8,11,34,28,71,43,33,20)
+x1j2 <- c(27,23,64,44,30,75,26,124,54,30,14)
+x2j1 <- c(25,28,36,35,15,44,42,54,34,29,39)
+x2j2 <- c(15,13,22,29,31,64,30,64,56,20,21)
+d1 <- x1j1 - x2j1
+d2 <- x1j2 - x2j2
+d <- matrix(c(d1, d2), ncol = 2)
+n <- nrow(d)
+
+j <- matrix(1, n, n)
+Sd <- 1/(n-1) * t(d) %*% (diag(n) - j/n) %*% d
+
+cat("Matriks d\n\n")
+d
+
+cat("Matriks j\n\n")
+j
+
+cat("Matriks Sd\n\n")
+Sd
+
+# Uji Beda Rata-rata 2 Populasi Dependen (Statistic Uji T2 Hotelling's)
+dbar <- matrix(c(mean(d1), mean(d2)))
+p <- ncol(d)
+a <- .05
+T2 = n * t(dbar) %*% solve(Sd) %*% dbar
+T2tab = p*(n-1) / (n-p) * qf(1 - a, p, n - p)
+
+if(T2 > T2tab){
+  cat(T2, ">", T2tab, "\nTolak H0")
+}else{
+  cat(T2, "<", T2tab,"\nGagal tolak H0")
+}
+
+# Menghitung Selang Kepercayaan
+ci1 <- mean(d1) + c(c(-1,1) * (T2tab * Sd[1,1] / n)^0.5)
+ci2 <- mean(d2) + c(c(-1,1) * (T2tab * Sd[2,2] / n)^0.5)
+cat("d1\n", d1, "\n\nd2\n", d2)
+cat("\n\nSelang Delta1 (95%) \n", ci1[1], ci1[2], "\n\nSelang Delta2 (95%)\n", ci2[1], ci2[2])
+```
+
