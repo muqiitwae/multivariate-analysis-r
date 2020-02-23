@@ -8,32 +8,42 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+Langkah penggunaan syntax:
+1) Masukkan data untuk masing-masing treatment/populasi ke dalam suatu matrix (input satu per satu variabel diselesaikan untuk treatment/populasi pertama, jangan zigzag)
 
-```{r cars}
+2) Setelah dimasukkan, run syntax dengan menekan Ctrl+Shift+Enter sesuai kotak chunks yang diinginkan, misalkan kotak chunks yang pertama dibawah ini ingin dapatkan matrix Sd. 
+
+3) Enjoy your day! ^_^
+```{r}
 ######## Richard Johnson Ed. 5 p. 275 ########
-x1j1 <- c(6,6,18,8,11,34,28,71,43,33,20)
-x1j2 <- c(27,23,64,44,30,75,26,124,54,30,14)
-x2j1 <- c(25,28,36,35,15,44,42,54,34,29,39)
-x2j2 <- c(15,13,22,29,31,64,30,64,56,20,21)
-d1 <- x1j1 - x2j1
-d2 <- x1j2 - x2j2
-d <- matrix(c(d1, d2), ncol = 2)
-n <- nrow(d)
+# data pada treatment pertama 
+y1 <- matrix(c(6,6,18,8,11,34,28,71,43,33,20,27,23,64,44,30,75,26,124,54,30,14), ncol = 2) 
+# data pada treatment kedua
+y2 <- matrix(c(25,28,36,35,15,44,42,54,34,29,39,15,13,22,29,31,64,30,64,56,20,21), ncol = 2)
 
-j <- matrix(1, n, n)
-Sd <- 1/(n-1) * t(d) %*% (diag(n) - j/n) %*% d
+d <- y1 - y2 # matrix d, selisih y1 dan y2
+n <- nrow(d)
+dbar <- apply(d, 2, mean)
+Sd <- cov(d)
+cat("Matriks treatment pertama\n\n")
+y1
+
+cat("Matriks treatment kedua\n\n")
+y2
 
 cat("Matriks d\n\n")
 d
 
-cat("Matriks j\n\n")
-j
+cat("Matriks dbar\n\n")
+dbar
 
 cat("Matriks Sd\n\n")
 Sd
+```
 
+Syntax di bawah ini untuk menguji Beda Rata-rata 2 Populasi Dependen
+```{r}
 # Uji Beda Rata-rata 2 Populasi Dependen (Statistic Uji T2 Hotelling's)
-dbar <- matrix(c(mean(d1), mean(d2)))
 p <- ncol(d)
 a <- .05
 T2 = n * t(dbar) %*% solve(Sd) %*% dbar
@@ -44,11 +54,14 @@ if(T2 > T2tab){
 }else{
   cat(T2, "<", T2tab,"\nGagal tolak H0")
 }
+```
 
+Syntax di bawah ini untuk menghitung selang kepercayaan
+```{r}
 # Menghitung Selang Kepercayaan
-ci1 <- mean(d1) + c(c(-1,1) * (T2tab * Sd[1,1] / n)^0.5)
-ci2 <- mean(d2) + c(c(-1,1) * (T2tab * Sd[2,2] / n)^0.5)
-cat("d1\n", d1, "\n\nd2\n", d2)
+ci1 <- dbar[1] + c(c(-1,1) * (T2tab * Sd[1,1] / n)^0.5)
+ci2 <- dbar[2] + c(c(-1,1) * (T2tab * Sd[2,2] / n)^0.5)
+cat("d1\n", d[,1], "\n\nd2\n", d[,2])
 cat("\n\nSelang Delta1 (95%) \n", ci1[1], ci1[2], "\n\nSelang Delta2 (95%)\n", ci2[1], ci2[2])
 ```
 

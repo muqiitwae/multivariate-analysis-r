@@ -1,0 +1,79 @@
+---
+title: "two populations independent (unknown variance)"
+author: "muqiitsaputra"
+date: "2/22/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Langkah penggunaan syntax:
+1) Masukkan data untuk masing-masing treatment/populasi ke dalam suatu matrix (input satu per satu variabel diselesaikan untuk treatment/populasi pertama, jangan zigzag)
+
+2) Setelah dimasukkan, run syntax dengan menekan Ctrl+Shift+Enter sesuai kotak chunks yang diinginkan, misalkan kotak chunks yang pertama dibawah ini ingin dapatkan matrix Spooled. Kemudian kotak chunks yang kedua dibawahnya untuk dapatkan hasil pengujian Beda Vector Mean 2 Populasi Independent.
+
+3) Enjoy your day! ^_^
+
+```{r}
+########## Soal UTS APG 2016/2017 No. 2 ###########
+# data treatment pertama
+y1 <- matrix(c(6.3,7,7.1,7.7,5.8,7.8,8.3,10.6,9,7,8.2,8.5,8.4,6.7,6.2,10.3,11.3,10.2,8.1,11.3,11.2,9.9,4.6,8.5,10.2,10.1,13.1,8), ncol = 2)
+# data treatment kedua
+y2 <- matrix(c(7.9,7.5,13.1,9.5,7.6,5.8,8.6,7.8,7.3,7.6,6.5,7.3,13.9,11.1,11.6,11.4,11.3,14,13.9,15.2,11.5,11.7,6.9,8.4), ncol = 2)
+n1 <- nrow(y1)
+n2 <- nrow(y2)
+S1 <- cov(y1)
+S2 <- cov(y2)
+Sp <- ((n1 - 1)*S1 + (n2 - 1)*S2) / (n1 + n2 - 2)
+cat("Matriks y1\n\n")
+y1
+
+cat("Matriks y2\n\n")
+y2
+
+cat("Matriks S1\n\n")
+S1
+
+cat("Matriks S2\n\n")
+S2
+
+cat("Matriks Sp\n\n")
+Sp
+```
+
+Syntax dibawah ini untuk menguji Beda Vector Mean 2 Populasi Independent
+*) Asumsi: Sigma1 = Sigma2 = Sigma (Equal Variances/Variansnya sama)
+```{r}
+# Pengujian Beda Vector Mean 2 Populasi Independen (Unknown Variance, Equal Variance)
+ybar1 <- apply(y1, 2, mean)
+ybar2 <- apply(y2, 2, mean)
+T2 <- n1*n2 / (n1+n2) * t(ybar1 - ybar2) %*% solve(Sp) %*% (ybar1 - ybar2)
+p <- ncol(y1)
+a <- .05
+T2tab = p*(n1 + n2 - 2) / (n1 + n2 - p - 1) * qf(1 - a, p, n1 + n2 - p - 1)
+
+if(T2 > T2tab){
+  cat(T2, ">", T2tab, "\nTolak H0")
+}else{
+  cat(T2, "<", T2tab,"\nGagal tolak H0")
+}
+```
+
+Syntax dibawah ini untuk menguji Beda Vector Mean 2 Populasi Independent
+*) Asumsi: Sigma1 tidak sama Sigma2 (Not Equal Variances/Variansnya ga sama)
+```{r}
+# Pengujian Beda Vector Mean 2 Populasi Independen (Unknown Variance, not Equal Variance)
+ybar1 <- apply(y1, 2, mean)
+ybar2 <- apply(y2, 2, mean)
+T2 <- n1*n2 / (n1+n2) * t(ybar1 - ybar2) %*% solve(S1 + S2) %*% (ybar1 - ybar2)
+p <- ncol(y1)
+a <- .05
+T2tab = p*(n1 + n2 - 2) / (n1 + n2 - p - 1) * qf(1 - a, p, n1 + n2 - p - 1)
+
+if(T2 > T2tab){
+  cat(T2, ">", T2tab, "\nTolak H0")
+}else{
+  cat(T2, "<", T2tab,"\nGagal tolak H0")
+}
+```

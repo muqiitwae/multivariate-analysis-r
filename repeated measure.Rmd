@@ -8,8 +8,15 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+Langkah penggunaan syntax:
+1) Masukkan data untuk masing-masing treatment/populasi ke dalam suatu matrix (input satu per satu variabel diselesaikan untuk treatment/populasi pertama, jangan zigzag)
 
-```{r cars}
+2) Setelah dimasukkan, run syntax dengan menekan Ctrl+Shift+Enter sesuai kotak chunks yang diinginkan, misalkan kotak chunks yang pertama dibawah ini ingin dapatkan matrix S.
+
+3) Isikan contrast matrix (C) sesuai yang diinginkan di soal (Baca Konsepnya di Buku Johnson !)
+
+4) Enjoy your day! ^_^
+```{r}
 ######## Richard Johnson Ed. 5 p. 281 ########
 x1 <- c(426,253,359,432,405,324,310,326,375,286,349,429,348,412,347,434,364,420,397)
 x2 <- c(609,236,433,431,426,438,312,326,447,286,382,410,377,473,326,458,367,395,556)
@@ -17,9 +24,8 @@ x3 <- c(556,392,349,522,513,507,410,350,547,403,473,488,447,472,455,637,432,508,
 x4 <- c(600,395,357,600,513,539,456,504,548,422,497,547,514,446,468,524,469,531,625)
 x <- cbind(x1, x2, x3, x4)
 n <- nrow(x)
-j <- matrix(1, n, n)
 C <- matrix(c(-1,-1,1,1,1,-1,1,-1,1,-1,-1,1), ncol = 4, byrow = TRUE) #contrast matrix, sesuaikan dengan soal
-S <- 1/(n-1) * t(x) %*% (diag(n) - j/n) %*% x
+S <- cov(x)
 cat("Matriks x\n\n")
 x
 
@@ -28,9 +34,12 @@ C
 
 cat("Matriks S\n\n")
 S
+```
 
+Syntax di bawah ini untuk menguji Beda Rata-rata pada repeated measure
+```{r}
 # Uji Beda Rata-rata pada Repeated Measure (Statistic Uji T2 Hotelling's)
-xbar <- matrix(c(mean(x1), mean(x2), mean(x3), mean(x4)), 4)
+xbar <- apply(x, 2, mean)
 p <- ncol(x) - 1
 a <- .05
 T2 = n * t(C %*% xbar) %*% solve(C %*% S %*% t(C)) %*% (C %*% xbar)
@@ -41,7 +50,11 @@ if(T2 > T2tab){
 }else{
   cat(T2, "<", T2tab,"\nGagal tolak H0")
 }
+```
 
+Syntax di bawah ini untuk menghitung simultanous confidence interval untuk repeated measure
+*) Abaikan warning yang muncul ketika running syntax
+```{r}
 # Menghitung Selang Kepercayaan
 # C1 =  (miu3 + miu 4) - (miu1 + miu2) #
 b = 1 #baris pada matrix C
