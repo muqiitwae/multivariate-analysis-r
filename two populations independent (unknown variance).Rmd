@@ -77,3 +77,13 @@ if(T2 > T2tab){
   cat(T2, "<", T2tab,"\nGagal tolak H0")
 }
 ```
+
+Syntax di bawah ini untuk menghitung selang kepercayaan, apabila tolak H0
+```{r}
+# Menghitung Selang Kepercayaan
+sel.ybar <- ybar1 - ybar2
+ci1 <- sel.ybar[1] + c(c(-1,1) * (T2tab * Sp[1,1] / (1/n1 + 1/n2))^0.5)
+ci2 <- sel.ybar[2] + c(c(-1,1) * (T2tab * Sp[2,2] / (1/n1 + 1/n2))^0.5)
+cat("xbar11 - xbar12\n", sel.ybar[1], "\nxbar21 - xbar22\n", sel.ybar[2])
+cat("\n\nSelang xbar11 - xbar12 (95%) \n", ci1[1], ci1[2], "\n\nSelang xbar21 - xbar22 (95%)\n", ci2[1], ci2[2])
+```
