@@ -1,7 +1,7 @@
 # multivariate-analysis-r
 A set of multivariate analysis's syntax in R Language.
 
-This file wrote in R Markdown.
+This file wrote in R Markdown, so you must install 'knitr' first.
 
 To open this file, please to use Rstudio.
 
