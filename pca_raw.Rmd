@@ -1,0 +1,46 @@
+---
+title: "pca_raw"
+author: "muqiitsaputra"
+date: "3/23/2020"
+output: word_document
+---
+# WELCOME TO MY LIFE #
+# ATURAN PENGGUNAAN:
+# GUNAKAN SYNTAX INI APABILA YANG TERSEDIA DATA MENTAH (RAW DATA)
+# GANTI DATA CONTOH DENGAN DATAMU DULU YA SAYANG!!
+# RUN TIAP CHUNK DENGAN MENEKAN CTRL+SHIFT+ENTER
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r raw}
+x1 <- c(13.4,14.6,13.5,15,14.6,14,16.4,14.8,15.2,15.5,15.2,16.9,14.8,16.2,14.7,14.7,16.5,15.4,15.1,14.2,15.9,16,17.4,14.3,14.8,14.9,15.5,14.5,14.4,14.6,15.3,14.9,15.8,14.4,14.7,14.8,15.4,16.2,15,15.1,16,15.3,14.5,14.2,15,14.2,14.9,16.2,14.5,16.4,14.7)
+x2 <- c(39,46,42,46,44,44,49,44,46,48,47,50,44,45,43,42,45,45,45,46,46,47,50,43,44,43,45,43,45,44,45,45,47,44,46,43,45,50,45,47,46,48,41,41,45,46,45,48,45,49,44)
+x3 <- c(4100,5000,4500,4600,5100,4900,4300,4400,4100,8400,5600,5100,4700,5600,4000,3400,5400,6900,4600,4200,5200,4700,8600,5500,4200,4300,5200,3900,6000,4700,7900,3400,6000,7700,3700,5200,6000,8100,4900,6000,4600,5500,6200,4900,7200,5800,8400,3100,4000,6900,7800)
+x4 <- c(14,15,19,23,17,20,21,16,27,34,26,28,24,26,23,9,18,28,17,14,8,25,37,20,15,9,16,18,17,23,43,17,23,31,11,25,30,32,17,22,20,20,20,26,40,22,61,12,20,35,38)
+x5 <- c(25,30,21,16,31,24,17,26,13,42,27,17,20,25,13,22,32,36,29,25,34,14,39,31,24,32,30,18,37,21,23,15,32,39,23,19,25,38,26,33,22,23,36,20,25,31,17,15,18,22,34)
+x6 <- c(17,20,18,18,19,19,18,29,27,36,22,23,23,19,17,13,17,24,17,28,16,18,17,19,29,17,20,25,23,27,23,24,21,23,23,22,18,18,24,16,22,23,21,20,25,22,17,18,20,24,16)
+mydata <- cbind(x1, x2, x3, x4, x5, x6)
+p <- ncol(mydata)
+corr <- round(cor(mydata), digits = 4)
+cova <- round(cov(mydata), digits = 4)
+cat("Covariances Matrix:\n")
+cova
+cat("\nCorrelation Matrix:\n")
+corr
+```
+
+### IMPORTANT ###
+JIKA VARIABEL MEMILIKI SATUAN YANG BERBEDA-BEDA SEPERTI CONTOH MAKA GUNAKAN MATRIKS R, YAKNI PADA FUNGSI princomp(..., cor = TRUE)
+
+JIKA SATUANNYA SAMA SEMUA MAKA GUNAKAN MATRIKS S, YAKNI PADA FUNGSI princomp(..., cor = FALSE)
+
+```{r pca}
+pca_dt <- princomp(mydata, cor = TRUE)
+summary(pca_dt)
+cat("\n--------------------------------------------------------------------------")
+cat("\nLoadings:\n")
+round(loadings(pca_dt)[1:p,1:p], digits = 4)
+screeplot(pca_dt, type = "lines", col = 4)
+```

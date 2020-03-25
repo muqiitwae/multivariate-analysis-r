@@ -1,0 +1,45 @@
+---
+title: "pca_matrices"
+author: "muqiitsaputra"
+date: "3/25/2020"
+output: word_document
+---
+# WELCOME TO MY LIFE #
+# ATURAN PENGGUNAAN:
+# GANTI DATA CONTOH DENGAN DATAMU DULU YA SAYANG!!
+# GUNAKAN CHUNK (kotak) COVARIANCE JIKA VARIABEL DATAMU SATUANNYA SAMA
+# GUNAKAN CHUNK (kotak) CORRELATION JIKA VARIABEL DATAMU SATUANNYA BEDA
+# RUN TIAP CHUNK DENGAN MENEKAN CTRL+SHIFT+ENTER
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### PCA with Covariances Matrix ###
+```{r covariance}
+S <- matrix(c(3266.46, 1343.97, 731.54, 1175.5, 162.68, 238.37, 1343.97, 721.91, 324.25, 537.35, 80.17, 117.73, 731.54, 324.25, 179.28, 281.17, 39.15, 56.8, 1175.5, 537.35, 281.17, 474.98, 63.73, 94.85, 162.68, 80.17, 39.15, 63.73, 9.95, 13.88, 238.37, 117.73, 56.8, 94.85, 13.88, 21.26), ncol = 6)
+p <- ncol(S)
+pca_S <- princomp(covmat = S)
+summary(pca_S)
+cat("\n--------------------------------------------------------------------------")
+cat("\nLoadings:\n")
+round(loadings(pca_S)[1:p,1:p], digits = 4)
+```
+```{r screeplot matrix S}
+screeplot(pca_S, type = "lines", col = 4)
+```
+
+
+### PCA with Correlations Matrix ###
+```{r correlation}
+R <- solve(sqrt(diag(diag(S)))) %*% S %*% solve(sqrt(diag(diag(S))))
+pca_R <- princomp(covmat = R, cor = TRUE)
+summary(pca_R)
+cat("\n--------------------------------------------------------------------------")
+cat("\nLoadings:\n")
+round(loadings(pca_R)[1:p,1:p], digits = 4)
+```
+
+```{r screeplot matrix R}
+screeplot(pca_R, type = "lines", col = 4)
+```
