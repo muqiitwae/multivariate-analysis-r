@@ -1,0 +1,83 @@
+---
+title: "af_raw"
+author: "muqiitsaputra"
+date: "3/31/2020"
+output: word_document
+---
+# WELCOME TO MY LIFE #
+# ATURAN PENGGUNAAN:
+# GANTI DATA CONTOH DENGAN DATAMU DULU YA SAYANG!!
+# RUN TIAP CHUNK DENGAN MENEKAN CTRL+SHIFT+ENTER
+# INSTALL PACKAGES: MVN, REdaS, psych
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# 1) Input Data
+# Data Contoh: Air-Polution Data (Table 1.5 R. Johnson Ed. 5)
+```{r input}
+x1 <- c(8,7,7,10,6,8,9,5,7,8,6,6,7,10,10,9,8,8,9,9,10,9,8,5,6,8,6,8,6,10,8,7,5,6,10,8,5,5,7,7,6,8)
+x2 <- c(98,107,103,88,91,90,84,72,82,64,71,91,72,70,72,77,76,71,67,69,62,88,80,30,83,84,78,79,62,37,71,52,48,75,35,85,86,86,79,79,68,40)
+x3 <- c(7,4,4,5,4,5,7,6,5,5,5,4,7,4,4,4,4,5,4,3,5,4,4,3,5,3,4,2,4,3,4,4,6,4,4,4,3,7,7,5,6,4)
+x4 <- c(2,3,3,2,2,2,4,4,1,2,4,2,4,2,1,1,1,3,2,3,3,2,2,3,1,2,2,1,3,1,1,1,5,1,1,1,1,2,4,2,2,3)
+x5 <- c(12,9,5,8,8,12,12,21,11,13,10,12,18,11,8,9,7,16,13,9,14,7,13,5,10,7,11,7,9,7,10,12,8,10,6,9,6,13,9,8,11,6)
+x6 <- c(8,5,6,15,10,12,15,14,11,9,3,7,10,7,10,10,7,4,2,5,4,6,11,2,23,6,11,10,8,2,7,8,4,24,9,10,12,18,25,6,14,5)
+x7 <- c(2,3,3,4,3,4,5,4,3,4,3,3,3,3,3,3,3,4,3,3,4,3,4,3,4,3,3,3,3,3,3,4,3,3,2,2,2,2,3,2,3,2)
+mydata <- cbind(x1, x2, x3, x4, x5, x6)
+```
+
+# 2) Pengecekan asumsi normal multivariate
+```{r mvn test}
+library(MVN)
+mvn(mydata)
+```
+
+# 3) Pengecekan asumsi interdependensi variabel
+```{r asumsi}
+library(REdaS)
+bs <- bart_spher(mydata)
+sig <- .05 # Ubah nilai alpha disini yaa
+bs
+if(bs$p.value < sig){
+  cat("Karena", bs$p.value, "<", sig, "maka tolak H0\nKesimpulan: Terdapat korelasi yang signifikan antar variabel (Hint: Lanjut Analisis Faktor)\n")
+}else{
+  cat("Karena", bs$p.value, ">", sig,"maka gagal tolak H0\nKesimpulan: Tidak terdapat korelasi yang signifikan antar variabel\n")
+}
+cat("--------------------------------------------------------------------------")
+kmo <- KMOS(mydata)
+kmo
+if(kmo$KMO < .5){
+  cat("Karena nilai KMO sangat kecil (< 0.5), artinya variabel yang digunakan belum sesuai dilakukan analisis faktor")
+}
+```
+
+# 4) Menentukan jumlah faktor
+```{r nFaktor}
+R <- cor(mydata)
+ev <- eigen(R)$values
+cat("Nilai eigen:\n")
+ev
+nFaktor <- 0
+for (val in ev){
+  if (val > 1) {
+    nFaktor = nFaktor+1
+  }
+}
+cat("\nBerdasarkan nilai eigen, berarti jumlah faktor:", nFaktor, "\nYuhuu ^_^")
+```
+
+# 5) Analisis Faktor
+```{r}
+af1 <- factanal(factors = nFaktor, covmat = R)
+af1
+cat("\n--------------------------------------------------------------------------")
+cat("\nJika nilai loadings gak keluar:\n")
+round(af1$loadings[,1:af1$factors], digits = 4)
+```
+# KALAU PENGEN OUTPUT LEBIH LENGKAP PAKAI INI YA, TAPI METODE ESTIMASI BEDA !
+```{r}
+library(psych)
+af <- fa(R, nfactors = nFaktor, rotate = "varimax", fm = "pa")
+af
+```
