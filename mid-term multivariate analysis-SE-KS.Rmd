@@ -1,0 +1,222 @@
+---
+title: "mid-term multivariate analysis"
+author: "muqiitsaputra"
+date: "3/17/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+```
+#1) Syntax soal nomor 1
+```{r}
+# Input data
+evalues <- matrix(c(5.100851, 0, 0, 1.406176), nrow = 2)
+evectors <- matrix(c(-0.6314539, -0.7754134, 0.7754134, -0.6314539), ncol = 2)
+mu0 <- c(4, 10)
+xbr <- c(4.64, 9.965)
+S1 <- evectors %*% evalues %*% solve(evectors) # S1 maksudnya matriks Sigma utk No. 1
+
+# Hotelling's T2 Mean Vector
+n <- 20
+T2 <- n * t(xbr - mu0) %*% solve(S1) %*% (xbr - mu0)
+p <- 2
+a <- .10
+T2tab = p*(n - 1) / (n - p) * qf(1-a, p, n - p)
+
+if(T2 > T2tab){
+  cat(T2, ">", T2tab, "\nTolak H0")
+}else{
+  cat(T2, "<", T2tab,"\nGagal tolak H0")
+}
+
+cat("\n---------------------------------------------------------\n")
+# Selang kepercayaan 90%
+ci1 <- xbr[1] + c(c(-1,1) * sqrt(T2tab) * sqrt(S1[1,1] * (1/n)))
+ci2 <- xbr[2] + c(c(-1,1) * sqrt(T2tab) * sqrt(S1[2,2] * (1/n)))
+cat("xbar1 \n", xbr[1], "\nxbar2\n", xbr[2])
+cat("\n\nSelang xbar1 (90%) \n", ci1[1], ci1[2], "\n\nSelang xbar2 (90%)\n", ci2[1], ci2[2])
+
+# Ellipse
+mixtools::ellipse(xbr, S1, alpha = .10, npoints = 250, newplot = TRUE)
+```
+
+#2) Syntax soal nomor 2
+```{r}
+# Input data
+n <- 100
+xbar <- c(3.23, 3.22, 3.13, 3.11)
+C <- matrix(c(1,1,1,1,-1,-1,-1,1,-1,-1,-1,1), ncol = 4) #contrast matrix, sesuaikan dengan soal
+R <- matrix(c(1, 0.75, 0.727, 0.588, 0.75, 1, 0.629, 0.095, 0.727, 0.629, 1, 0.684, 0.588, 0.095, 0.684, 1), ncol = 4) # matrix correlation
+sd <- c(0.251, 0.149, 0.254, 0.141) # standar deviasi
+S <- diag(sd) %*% S %*% diag(sd) # matrix variance-covariance
+
+cat("Matriks xbar\n\n")
+xbar
+
+cat("Matriks C\n\n")
+C
+
+cat("Matriks S\n\n")
+S
+
+cat("---------------------------------------------------------\n")
+cat("T2 Hotelling's \n")
+# Uji Beda Rata-rata pada Repeated Measure (Statistic Uji T2 Hotelling's)
+p <- 4 - 1
+a <- .05
+T2 = n * t(C %*% xbar) %*% solve(C %*% S %*% t(C)) %*% (C %*% xbar)
+T2tab = p*(n-1) / (n-p) * qf(1 - a, p, n - p)
+
+if(T2 > T2tab){
+  cat(T2, ">", T2tab, "\nTolak H0")
+}else{
+  cat(T2, "<", T2tab,"\nGagal tolak H0")
+}
+cat("\n---------------------------------------------------------\n")
+
+# Menghitung Selang Kepercayaan
+cat("Menghitung Selang Kepercayaan \n")
+# C1 =  (miu1 + miu2) - (miu3 + miu4) 
+C[1,1:4] %*% xbar
+C1 <- (C[1,1:4] %*% xbar) + c(c(-1,1) * sqrt(T2tab) * sqrt((t(C[1,1:4])%*%S%*%C[1,1:4]) / n))
+cat("(miu1 + miu2) - (miu3 + miu4)\n")
+cat("Selang (95%) \n", C1[1], C1[2])
+
+# C2 =  (miu1 + miu 3) - (miu2 + miu4) 
+C[2,1:4] %*% xbar
+C2 <- (C[2,1:4] %*% xbar) + c(-1,1) * sqrt(T2tab) * sqrt((t(C[2,1:4])%*%S%*%C[2,1:4]) / n)
+cat("(miu1 + miu 3) - (miu2 + miu4)\n")
+cat("Selang (95%) \n", C2[1], C2[2])
+
+# C3 =  (miu1 + miu 4) - (miu2 + miu3) 
+C[3,1:4] %*% xbar
+C3 <- (C[3,1:4] %*% xbar) + c(-1,1) * sqrt(T2tab) * sqrt((t(C[3,1:4])%*%S%*%C[3,1:4]) / n)
+cat("(miu1 + miu 4) - (miu2 + miu3)\n")
+cat("Selang (95%) \n", C3[1], C3[2])
+
+cat("\n---------------------------------------------------------")
+```
+
+#3) Syntax soal nomor 3
+```{r}
+# Exact Bartlet
+r1 <- matrix(c(1, -0.65, 0.34, -0.65, 1, 0.42, 0.34, 0.42, 1), ncol = 3)
+ybar1 <- c(21650, 39, 93640)
+n1 <- 15
+sd1 <- c(1250, 14, 12740)
+Sy1 <- diag(sd1) %*% r1 %*% diag(sd1)
+
+r2 <- matrix(c(1, -0.55, 0.42, -0.55, 1, 0.45, 0.42, 0.45, 1), ncol = 3)
+ybar2 <- c(20130, 43, 89560)
+n2 <- 17
+sd2 <- c(1190, 11, 13100)
+Sy2 <- diag(sd2) %*% r2 %*% diag(sd2)
+
+
+r3 <- matrix(c(1, -0.65, 0.34, -0.65, 1, 0.42, 0.34, 0.42, 1), ncol = 3)
+ybar3 <- c(22170, 41, 95560)
+n3 <- 18
+sd3 <- c(1310, 12, 12100)
+Sy3 <- diag(sd3) %*% r3 %*% diag(sd3)
+
+
+r4 <- matrix(c(1, -0.66, 0.38, -0.66, 1, 0.41, 0.38, 0.41, 1), ncol = 3)
+ybar4 <- c(16250, 35, 96640)
+n4 <- 20
+sd4 <- c(1210, 13, 12640)
+Sy4 <- diag(sd4) %*% r4 %*% diag(sd4)
+
+
+r5 <- matrix(c(1, -0.59, 0.43, -0.59, 1, 0.46, 0.43, 0.46, 1), ncol = 3)
+ybar5 <- c(19860, 44, 92620)
+n5 <- 13
+sd5 <- c(1336, 15, 12290)
+Sy5 <- diag(sd5) %*% r5 %*% diag(sd5)
+
+
+W <- (n1 - 1)*Sy1 + (n2 - 1)*Sy2 + (n3 - 1)*Sy3 + (n4 - 1)*Sy4 + (n5 - 1)*Sy5 # matrix W atau SSRes
+ybar <- (n1*ybar1 + n2*ybar2 + n3*ybar3 + n4*ybar4 + n5*ybar5) / (n1 + n2 + n3 + n4 + n5) # grand mean
+B1 <- n1*(ybar1 - ybar) %*% t(ybar1 - ybar) 
+B2 <- n2*(ybar2 - ybar) %*% t(ybar2 - ybar)
+B3 <- n3*(ybar3 - ybar) %*% t(ybar3 - ybar)
+B4 <- n4*(ybar4 - ybar) %*% t(ybar4 - ybar)
+B5 <- n5*(ybar5 - ybar) %*% t(ybar5 - ybar)
+B <- B1 + B2 + B3 + B4 + B5 # matrix B atau SSTr
+n <- n1 + n2 + n3 + n4 + n5
+p <- 3
+g <- 5
+wilks.lambda <- det(W) / det(W+B)
+chsq <- (-1)*(n - 1 - ((p+g)/2))*log(wilks.lambda)
+chsqTab <- qchisq(.95, df = p*(g-1))
+
+cat("Matriks xbar (grand mean)\n")
+ybar
+
+cat("\nMatriks W\n")
+W
+
+cat("\nMatriks B\n")
+B
+
+cat("\nMatriks B+W\n")
+B+W
+
+cat("\nNilai Wilks Lambda\n", wilks.lambda)
+
+cat("\n--------------------------------------------------------------------\n\n")
+
+if(chsq > chsqTab){
+  cat(chsq, ">", chsqTab, "\nTolak H0")
+}else{
+  cat(chsq, "<", chsqTab,"\nGagal tolak H0")
+}
+
+cat("\n--------------------------------------------------------------------\n\n")
+
+
+```
+
+```{r}
+# confidence interval
+T1 = ybar1 - ybar
+T2 = ybar2 - ybar
+T3 = ybar3 - ybar
+T4 = ybar4 - ybar
+T5 = ybar5 - ybar
+stat.uji1 = qt(1-(.05/(p*g*(g-1))), df = n-g); 
+for (i in 1:p) {
+  x1 =  stat.uji1 * sqrt((1/n1+1/n2)*W[i,i]/(n-g));
+  x2 =  stat.uji1 * sqrt((1/n1+1/n3)*W[i,i]/(n-g)); 
+  x3 =  stat.uji1 * sqrt((1/n1+1/n4)*W[i,i]/(n-g));
+  x4 =  stat.uji1 * sqrt((1/n1+1/n5)*W[i,i]/(n-g));
+  x5 =  stat.uji1 * sqrt((1/n2+1/n3)*W[i,i]/(n-g));
+  x6 =  stat.uji1 * sqrt((1/n2+1/n4)*W[i,i]/(n-g));
+  x7 =  stat.uji1 * sqrt((1/n2+1/n5)*W[i,i]/(n-g));
+  x8 =  stat.uji1 * sqrt((1/n3+1/n4)*W[i,i]/(n-g));
+  x9 =  stat.uji1 * sqrt((1/n3+1/n5)*W[i,i]/(n-g));
+  x10 =  stat.uji1 * sqrt((1/n4+1/n5)*W[i,i]/(n-g));
+  batas1 = (T1[i] - T2[i]) + c(-x1,x1);
+  batas2 = (T1[i] - T3[i]) + c(-x2,x2);
+  batas3 = (T1[i] - T4[i]) + c(-x3,x3);
+  batas4 = (T1[i] - T5[i]) + c(-x4,x4);
+  batas5 = (T2[i] - T3[i]) + c(-x5,x5);
+  batas6 = (T2[i] - T4[i]) + c(-x6,x6);
+  batas7 = (T2[i] - T5[i]) + c(-x7,x7);
+  batas8 = (T3[i] - T4[i]) + c(-x8,x8);
+  batas9 = (T3[i] - T5[i]) + c(-x9,x9);
+  batas10 = (T4[i] - T5[i]) + c(-x10,x10);
+  print(paste0("VARIABEL ", i));
+  print(paste0("SCI1 (T1 - T2): (", batas1[1] , ", " , batas1[2], ")"));
+  print(paste0("SCI2 (T1 - T3): (", batas2[1] , ", " , batas2[2], ")"));
+  print(paste0("SCI3 (T1 - T4): (", batas3[1] , ", " , batas3[2], ")"));
+  print(paste0("SCI4 (T1 - T5): (", batas4[1] , ", " , batas4[2], ")"));
+  print(paste0("SCI5 (T2 - T3): (", batas5[1] , ", " , batas5[2], ")"));
+  print(paste0("SCI6 (T2 - T4): (", batas6[1] , ", " , batas6[2], ")"));
+  print(paste0("SCI7 (T2 - T5): (", batas7[1] , ", " , batas7[2], ")"));
+  print(paste0("SCI8 (T3 - T4): (", batas8[1] , ", " , batas8[2], ")"));
+  print(paste0("SCI9 (T3 - T5): (", batas9[1] , ", " , batas9[2], ")"));
+  print(paste0("SCI10 (T4 - T5): (", batas10[1] , ", " , batas10[2], ")"));
+} 
+
+```
