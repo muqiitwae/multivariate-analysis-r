@@ -1,0 +1,74 @@
+---
+title: "af_outsource"
+author: "muqiitsaputra"
+date: "4/8/2020"
+output: word_document
+---
+# WELCOME TO MY LIFE #
+# ATURAN PENGGUNAAN:
+# GANTI DATA CONTOH DENGAN DATAMU DULU YA SAYANG!! (Untuk Data Excel/Csv)
+# RUN TIAP CHUNK DENGAN MENEKAN CTRL+SHIFT+ENTER
+# INSTALL PACKAGES: MVN, REdaS, psych
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# 1) Input Data
+# Data Contoh: National Track (R. Johnson Ed. 5)
+```{r input}
+library(foreign)
+nationaltrack <- read.csv("national-track.csv")
+mydata <- nationaltrack[,-1]
+```
+
+# 2) Pengecekan asumsi normal multivariate
+```{r mvn test}
+library(MVN)
+mvn(mydata)
+```
+
+# 3) Pengecekan asumsi interdependensi variabel
+```{r asumsi}
+library(REdaS)
+bs <- bart_spher(mydata)
+sig <- .05 # Ubah nilai alpha disini yaa
+bs
+if(bs$p.value < sig){
+  cat("Karena", bs$p.value, "<", sig, "maka tolak H0\nKesimpulan: Terdapat korelasi yang signifikan antar variabel (Hint: Lanjut Analisis Faktor)\n")
+}else{
+  cat("Karena", bs$p.value, ">", sig,"maka gagal tolak H0\nKesimpulan: Tidak terdapat korelasi yang signifikan antar variabel\n")
+}
+cat("--------------------------------------------------------------------------")
+kmo <- KMOS(mydata)
+kmo
+if(kmo$KMO < .5){
+  cat("Karena nilai KMO sangat kecil (< 0.5), artinya variabel yang digunakan belum sesuai dilakukan analisis faktor")
+}
+```
+
+# 4) Menentukan jumlah faktor
+```{r nFaktor}
+library(nFactors)
+R <- cor(mydata)
+ev <- eigen(R)$values
+ap <- parallel(subject = 55, var = 8, rep=100, cent = .05)
+nfaktor <- nScree(ev$values, ap$eigen$qevpea)
+plotnScree(nfaktor)
+```
+
+# 5) Analisis Faktor
+```{r}
+af1 <- factanal(factors = 3, covmat = R)
+af1
+cat("\n--------------------------------------------------------------------------")
+cat("\nJika nilai loadings gak keluar:\n")
+round(af1$loadings[,1:af1$factors], digits = 4)
+```
+# KALAU PENGEN OUTPUT LEBIH LENGKAP PAKAI INI YA, TAPI METODE ESTIMASI BEDA !
+```{r}
+library(psych)
+library(GPArotation)
+af <- fa(R, nfactors = 3, rotate = "varimax", fm = "pa")
+af
+```
